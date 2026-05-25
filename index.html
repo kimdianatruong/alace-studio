@@ -887,19 +887,19 @@
           <div class="palette-row" id="paletteRow">
             <div class="swatch-item">
               <div class="swatch" style="background:#b8bcc4;" title="Soft Silver Grey"></div>
-              <div class="swatch-label">Silver</div>
+              <div class="swatch-label" contenteditable="true">Silver</div>
             </div>
             <div class="swatch-item">
               <div class="swatch" style="background:#c8d8e8;" title="Icy Baby Blue"></div>
-              <div class="swatch-label">Ice Blue</div>
+              <div class="swatch-label" contenteditable="true">Ice Blue</div>
             </div>
             <div class="swatch-item">
               <div class="swatch" style="background:#2c2c2e;" title="Charcoal"></div>
-              <div class="swatch-label">Charcoal</div>
+              <div class="swatch-label" contenteditable="true">Charcoal</div>
             </div>
             <div class="swatch-item">
               <div class="swatch" style="background:#f7f4f0;" title="Cream"></div>
-              <div class="swatch-label">Cream</div>
+              <div class="swatch-label" contenteditable="true">Cream</div>
             </div>
             <div class="swatch-item">
               <button class="add-swatch" onclick="addSwatch()" title="Add colour">+</button>
@@ -1151,8 +1151,17 @@ Candid, movement, laughter</div>
   <div class="modal">
     <div class="modal-title">Add Reference</div>
     <div class="form-group">
-      <label class="form-label">Image URL</label>
-      <input class="form-input" id="imgUrl" placeholder="Paste direct image URL (screenshot, Google Images, etc.)">
+      <label class="form-label">Image</label>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('imgFileInput').click()">Upload from device</button>
+        <span style="font-size:0.65rem;color:var(--soft);">or paste a URL below</span>
+      </div>
+      <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="handleFileUpload(this)">
+      <input class="form-input" id="imgUrl" placeholder="Paste direct image URL...">
+      <div id="imgPreview" style="margin-top:8px;display:none;">
+        <img id="imgPreviewImg" style="max-width:100%;max-height:160px;border-radius:2px;object-fit:cover;" src="">
+        <button type="button" onclick="clearImageUpload()" style="background:none;border:none;cursor:pointer;font-size:0.65rem;color:var(--soft);margin-top:4px;display:block;">✕ Remove</button>
+      </div>
     </div>
     <div class="form-group">
       <label class="form-label">Source Link</label>
@@ -1438,6 +1447,7 @@ function openAddModal() {
 
 function closeModal() {
   document.getElementById('addModal').classList.remove('open');
+  clearImageUpload();
   editingIdx = null;
 }
 
@@ -1450,8 +1460,31 @@ function toggleTag(btn, tag) {
   }
 }
 
+// ─── FILE UPLOAD ──────────────────────────────────────────
+function handleFileUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    document.getElementById('imgUrl').value = '';
+    document.getElementById('imgUrl').dataset.uploadedImg = dataUrl;
+    document.getElementById('imgPreviewImg').src = dataUrl;
+    document.getElementById('imgPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImageUpload() {
+  document.getElementById('imgFileInput').value = '';
+  document.getElementById('imgUrl').dataset.uploadedImg = '';
+  document.getElementById('imgPreviewImg').src = '';
+  document.getElementById('imgPreview').style.display = 'none';
+}
+
 function saveCard() {
-  const img = document.getElementById('imgUrl').value.trim();
+  const uploadedImg = document.getElementById('imgUrl').dataset.uploadedImg;
+  const img = uploadedImg || document.getElementById('imgUrl').value.trim();
   const src = document.getElementById('srcUrl').value.trim();
   const label = document.getElementById('imgLabel').value.trim();
   const note = document.getElementById('imgNote').value.trim();
