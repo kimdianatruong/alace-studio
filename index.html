@@ -1236,14 +1236,21 @@ function saveState() {
 }
 
 // ─── INIT ─────────────────────────────────────────────────
-loadState();
-buildSchedule();
-renderBoard();
-renderShots();
-renderWardrobe();
-renderComments();
-renderThoughts();
-updateLastEdited();
+function init() {
+  loadState();
+  buildSchedule();
+  renderBoard();
+  renderShots();
+  renderWardrobe();
+  renderComments();
+  renderThoughts();
+  updateLastEdited();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
 // ─── SECTION NAV ──────────────────────────────────────────
 function showSection(id, btn) {
@@ -1775,12 +1782,15 @@ function exportModel(name) {
 }
 
 // ─── CLOSE MODAL ON OVERLAY CLICK ─────────────────────────
-document.getElementById('addModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-document.getElementById('swatchModal').addEventListener('click', function(e) {
-  if (e.target === this) closeSwatchModal();
-});
+function setupModalListeners() {
+  document.getElementById('addModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('swatchModal').addEventListener('click', function(e) {
+    if (e.target === this) closeSwatchModal();
+  });
+}
+setupModalListeners();
 
 // ─── KEYBOARD ─────────────────────────────────────────────
 document.addEventListener('keydown', e => {
