@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alace — Shoot Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f4f0;
+    --warm-white: #faf8f5;
+    --silver: #b8bcc4;
+    --silver-light: #dde0e6;
+    --ice-blue: #c8d8e8;
+    --ice-blue-light: #e8f0f7;
+    --charcoal: #2c2c2e;
+    --mid: #6b6b70;
+    --soft: #9a9a9f;
+    --lace: #d4c8bc;
+    --border: #e8e4de;
+    --gold: #c9a96e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 14px; }
+  body {
+    background: var(--cream);
+    color: var(--charcoal);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    color: var(--charcoal);
+    text-transform: uppercase;
+  }
+  .logo span {
+    color: var(--silver);
+  }
+  .header-meta {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--soft);
+  }
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  /* NAV TABS */
+  .nav {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .nav-tab {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--soft);
+    padding: 14px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+  }
+  .nav-tab:hover { color: var(--charcoal); }
+  .nav-tab.active {
+    color: var(--charcoal);
+    border-bottom: 2px solid var(--charcoal);
+  }
+
+  /* BOARD TABS */
+  .board-bar {
+    padding: 20px 40px 0;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .board-chip {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    background: var(--warm-white);
+    color: var(--mid);
+    transition: all 0.2s;
+    font-family: 'Jost', sans-serif;
+  }
+  .board-chip:hover { border-color: var(--silver); color: var(--charcoal); }
+  .board-chip.active {
+    background: var(--charcoal);
+    border-color: var(--charcoal);
+    color: white;
+  }
+  .board-chip.add-chip {
+    border-style: dashed;
+    color: var(--soft);
+  }
+  .status-badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+  .status-collecting { background: var(--ice-blue-light); color: #5a80a0; }
+  .status-refining { background: #fef3e2; color: #b8860b; }
+  .status-locked { background: #eef5ee; color: #4a7c59; }
+
+  /* MAIN LAYOUT */
+  .main { padding: 24px 40px 60px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* INSPO BOARD */
+  .inspo-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .tag-filter {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    background: none;
+    color: var(--mid);
+    font-family: 'Jost', sans-serif;
+    transition: all 0.2s;
+  }
+  .tag-filter:hover, .tag-filter.active {
+    background: var(--charcoal);
+    border-color: var(--charcoal);
+    color: white;
+  }
+  .btn {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border: 1px solid var(--charcoal);
+    background: var(--charcoal);
+    color: white;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+  .btn:hover { background: var(--mid); border-color: var(--mid); }
+  .btn-outline {
+    background: none;
+    color: var(--charcoal);
+  }
+  .btn-outline:hover { background: var(--charcoal); color: white; }
+  .btn-sm { padding: 5px 14px; font-size: 0.62rem; }
+  .btn-ice {
+    background: var(--ice-blue);
+    border-color: var(--ice-blue);
+    color: var(--charcoal);
+  }
+
+  /* MOODBOARD GRID */
+  .moodboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    min-height: 300px;
+  }
+  .inspo-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.2s;
+    cursor: grab;
+  }
+  .inspo-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .inspo-card.starred .star-btn { color: var(--gold); }
+  .inspo-card img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    display: block;
+    background: var(--cream);
+  }
+  .inspo-card .no-img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--soft);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .card-body { padding: 10px 12px 12px; }
+  .card-label {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+  .card-note {
+    font-size: 0.65rem;
+    color: var(--mid);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .card-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+  .card-tag {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--ice-blue-light);
+    color: #5a80a0;
+  }
+  .card-tag.tag-lighting { background: #fef9e7; color: #b8860b; }
+  .card-tag.tag-poses { background: #f0eef8; color: #7060a0; }
+  .card-tag.tag-location { background: #eef5ee; color: #4a7c59; }
+  .card-tag.tag-styling { background: var(--ice-blue-light); color: #5a80a0; }
+  .card-tag.tag-hair { background: #fdf0f0; color: #a06060; }
+  .card-tag.tag-colour { background: #f5f0f8; color: #806090; }
+  .card-tag.tag-props { background: #f0f5f0; color: #508050; }
+  .card-actions { display: flex; gap: 6px; align-items: center; }
+  .star-btn, .del-btn, .edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--silver);
+    padding: 2px;
+    transition: color 0.2s;
+  }
+  .star-btn:hover { color: var(--gold); }
+  .del-btn:hover { color: #c0392b; }
+  .edit-btn:hover { color: var(--charcoal); }
+  .card-link {
+    font-size: 0.6rem;
+    color: var(--silver);
+    text-decoration: none;
+    margin-left: auto;
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100px;
+  }
+  .card-link:hover { color: var(--charcoal); }
+
+  /* ADD CARD MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(44,44,46,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--warm-white);
+    width: 480px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 4px;
+    padding: 32px;
+  }
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    margin-bottom: 24px;
+    letter-spacing: 0.05em;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 6px;
+  }
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    background: white;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--charcoal);
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--silver); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .tag-select { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag-option {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    background: none;
+    color: var(--mid);
+    font-family: 'Jost', sans-serif;
+    transition: all 0.15s;
+  }
+  .tag-option.selected {
+    background: var(--charcoal);
+    border-color: var(--charcoal);
+    color: white;
+  }
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+
+  /* SHOOT PLANNING */
+  .planning-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .planning-grid.full { grid-template-columns: 1fr; }
+  @media(max-width: 900px) { .planning-grid { grid-template-columns: 1fr; } }
+  .card-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 24px;
+  }
+  .panel-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--soft);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  /* BRIEF FIELDS */
+  .brief-field { margin-bottom: 16px; }
+  .brief-key {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--soft);
+    margin-bottom: 5px;
+  }
+  .brief-value {
+    font-size: 0.82rem;
+    color: var(--charcoal);
+    line-height: 1.6;
+    min-height: 28px;
+    padding: 4px 0;
+    border-bottom: 1px solid transparent;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .brief-value:focus { border-bottom-color: var(--border); }
+  .brief-value[contenteditable="true"]:empty:before {
+    content: attr(data-placeholder);
+    color: var(--silver-light);
+    font-style: italic;
+  }
+
+  /* COLOUR PALETTE */
+  .palette-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+  }
+  .swatch:hover { transform: scale(1.1); }
+  .swatch-label { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mid); margin-top: 4px; text-align: center; width: 44px; }
+  .swatch-item { display: flex; flex-direction: column; align-items: center; }
+  .add-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px dashed var(--border);
+    background: none;
+    cursor: pointer;
+    color: var(--soft);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .add-swatch:hover { border-color: var(--silver); color: var(--charcoal); }
+
+  /* SHOT LIST */
+  .shot-list { display: flex; flex-direction: column; gap: 8px; }
+  .shot-item {
+    display: grid;
+    grid-template-columns: 28px 1fr 80px 80px 70px 28px;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--cream);
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+  .shot-num {
+    font-size: 0.65rem;
+    color: var(--soft);
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .shot-desc { color: var(--charcoal); }
+  .shot-light {
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .light-golden { background: #fef3d0; color: #8b6914; }
+  .light-morning { background: #e8f4f8; color: #4a7a8a; }
+  .light-shade { background: #f0f0f5; color: #606080; }
+  .light-magic { background: #f8e8f0; color: #8a4a70; }
+  .shot-format {
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .shot-look {
+    font-size: 0.65rem;
+    color: var(--soft);
+  }
+  .add-shot-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px 80px auto;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  /* SCHEDULE */
+  .schedule-day {
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .day-header {
+    background: var(--charcoal);
+    color: white;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .day-title { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
+  .day-date { font-size: 0.65rem; color: var(--silver); }
+  .day-blocks { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .time-block {
+    padding: 12px;
+    border-right: 1px solid var(--border);
+    min-height: 80px;
+  }
+  .time-block:last-child { border-right: none; }
+  .time-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--soft);
+    margin-bottom: 6px;
+  }
+  .time-content {
+    font-size: 0.72rem;
+    color: var(--charcoal);
+    line-height: 1.5;
+    outline: none;
+    min-height: 40px;
+  }
+  .time-content:focus { background: var(--cream); }
+  .time-content[contenteditable="true"]:empty:before {
+    content: '—';
+    color: var(--silver-light);
+  }
+  .block-golden { background: #fffbf0; }
+  .block-morning { background: #f5fbfd; }
+  .block-shade { background: #f8f8fc; }
+  .block-magic { background: #fdf5f9; }
+
+  /* WARDROBE */
+  .wardrobe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .look-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px;
+  }
+  .look-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--silver);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .look-field { margin-bottom: 8px; }
+  .look-key { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--soft); margin-bottom: 3px; }
+  .look-val {
+    font-size: 0.72rem;
+    color: var(--charcoal);
+    outline: none;
+    min-height: 18px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .look-val:focus { border-bottom-color: var(--border); }
+  .look-val[contenteditable="true"]:empty:before { content: attr(data-placeholder); color: var(--silver-light); }
+
+  /* MODEL BRIEFS */
+  .model-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width: 700px) { .model-grid { grid-template-columns: 1fr; } }
+  .model-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .model-header {
+    background: var(--cream);
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .model-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+  .model-body { padding: 20px 24px; }
+  .model-field { margin-bottom: 14px; }
+  .model-key { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--soft); margin-bottom: 4px; }
+  .model-val {
+    font-size: 0.78rem;
+    color: var(--charcoal);
+    line-height: 1.6;
+    outline: none;
+    min-height: 20px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .model-val:focus { border-bottom-color: var(--border); }
+  .model-val[contenteditable="true"]:empty:before { content: attr(data-placeholder); color: var(--silver-light); }
+
+  /* DELIVERABLES */
+  .deliverables-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .deliverable-item {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .del-type { font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--soft); }
+  .del-count {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    color: var(--charcoal);
+    outline: none;
+    min-width: 30px;
+  }
+  .del-note { font-size: 0.68rem; color: var(--mid); outline: none; min-height: 14px; }
+  .del-note[contenteditable="true"]:empty:before { content: 'Add note...'; color: var(--silver-light); }
+
+  /* COMMENTS */
+  .comments-thread { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .comment-item {
+    padding: 14px 16px;
+    background: var(--cream);
+    border-radius: 3px;
+    border-left: 2px solid var(--border);
+  }
+  .comment-item.kim { border-left-color: var(--ice-blue); }
+  .comment-item.jess { border-left-color: var(--lace); }
+  .comment-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+  .comment-author { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 400; }
+  .comment-author.kim { color: #5a80a0; }
+  .comment-author.jess { color: #a08060; }
+  .comment-date { font-size: 0.6rem; color: var(--soft); }
+  .comment-text { font-size: 0.78rem; color: var(--charcoal); line-height: 1.6; }
+  .comment-form { display: flex; flex-direction: column; gap: 10px; }
+  .author-select { display: flex; gap: 8px; }
+  .author-btn {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    background: none;
+    cursor: pointer;
+    border-radius: 14px;
+    font-family: 'Jost', sans-serif;
+    color: var(--mid);
+    transition: all 0.2s;
+  }
+  .author-btn.kim.active { background: var(--ice-blue); border-color: var(--ice-blue); color: var(--charcoal); }
+  .author-btn.jess.active { background: var(--lace); border-color: var(--lace); color: var(--charcoal); }
+
+  /* THOUGHTS */
+  .thoughts-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .thought-item {
+    padding: 14px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    position: relative;
+  }
+  .thought-text { font-size: 0.8rem; color: var(--charcoal); line-height: 1.6; outline: none; }
+  .thought-del {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--silver);
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: color 0.2s;
+  }
+  .thought-del:hover { color: #c0392b; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--soft);
+    text-align: center;
+    border: 1px dashed var(--border);
+    border-radius: 3px;
+  }
+  .empty-icon { font-size: 2rem; margin-bottom: 12px; }
+  .empty-text { font-size: 0.72rem; letter-spacing: 0.1em; margin-bottom: 16px; }
+
+  /* EXPORT */
+  .export-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .export-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--soft); margin-right: 8px; }
+
+  /* STATUS BAR */
+  .status-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .status-select {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    background: white;
+    font-family: 'Jost', sans-serif;
+    color: var(--mid);
+    cursor: pointer;
+    border-radius: 14px;
+    outline: none;
+  }
+  .last-edited { font-size: 0.65rem; color: var(--soft); }
+
+  /* RESPONSIVE */
+  @media(max-width: 768px) {
+    .header { padding: 0 20px; }
+    .nav { padding: 0 20px; }
+    .main { padding: 16px 20px 60px; }
+    .board-bar { padding: 16px 20px 0; }
+    .day-blocks { grid-template-columns: 1fr 1fr; }
+    .deliverables-grid { grid-template-columns: 1fr 1fr; }
+    .shot-item { grid-template-columns: 28px 1fr 70px 60px; }
+    .shot-item .shot-look { display: none; }
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--cream); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* DRAG */
+  .inspo-card.dragging { opacity: 0.5; }
+  .inspo-card.drag-over { border: 2px dashed var(--silver); }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* INLINE EDIT HINT */
+  [contenteditable="true"]:hover { background: rgba(0,0,0,0.02); }
+
+  .section-intro {
+    font-size: 0.68rem;
+    color: var(--soft);
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media(max-width: 800px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">Alace <span>/ Studio</span></div>
+  <div class="header-meta">Bali · Aug 22–29, 2025</div>
+  <div class="header-actions">
+    <button class="btn btn-outline btn-sm" onclick="exportBoard()">Export Board</button>
+    <button class="btn btn-sm" onclick="openAddModal()">+ Add Reference</button>
+  </div>
+</div>
+
+<!-- MAIN NAV -->
+<div class="nav">
+  <button class="nav-tab active" onclick="showSection('inspo', this)">Inspo Board</button>
+  <button class="nav-tab" onclick="showSection('brief', this)">Shoot Brief</button>
+  <button class="nav-tab" onclick="showSection('shotlist', this)">Shot List</button>
+  <button class="nav-tab" onclick="showSection('schedule', this)">Schedule</button>
+  <button class="nav-tab" onclick="showSection('wardrobe', this)">Styling</button>
+  <button class="nav-tab" onclick="showSection('models', this)">Model Briefs</button>
+  <button class="nav-tab" onclick="showSection('collab', this)">Notes & Ideas</button>
+</div>
+
+<!-- BOARD TABS -->
+<div class="board-bar" id="boardBar">
+  <button class="board-chip active" data-board="0" onclick="switchBoard(0, this)">
+    Concept 01 — Pool Edit <span class="status-badge status-collecting">Collecting</span>
+  </button>
+  <button class="board-chip" data-board="1" onclick="switchBoard(1, this)">
+    Concept 02 — Night Edit <span class="status-badge status-collecting">Collecting</span>
+  </button>
+  <button class="board-chip add-chip" onclick="addBoard()">+ New Board</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- INSPO BOARD -->
+  <div class="section active" id="section-inspo">
+    <div class="status-row">
+      <select class="status-select" onchange="updateStatus(this.value)" id="statusSelect">
+        <option value="collecting">Collecting</option>
+        <option value="refining">Refining</option>
+        <option value="locked">Locked</option>
+      </select>
+      <span class="last-edited" id="lastEdited">—</span>
+    </div>
+    <div class="inspo-toolbar">
+      <span style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--soft);margin-right:4px;">Filter:</span>
+      <button class="tag-filter active" onclick="filterTag('all', this)">All</button>
+      <button class="tag-filter" onclick="filterTag('lighting', this)">Lighting</button>
+      <button class="tag-filter" onclick="filterTag('poses', this)">Poses</button>
+      <button class="tag-filter" onclick="filterTag('location', this)">Location</button>
+      <button class="tag-filter" onclick="filterTag('styling', this)">Styling</button>
+      <button class="tag-filter" onclick="filterTag('hair', this)">Hair</button>
+      <button class="tag-filter" onclick="filterTag('colour', this)">Colour</button>
+      <button class="tag-filter" onclick="filterTag('props', this)">Props</button>
+      <button class="tag-filter" onclick="filterTag('starred', this)">★ Starred</button>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" onclick="exportBoard()">Export PNG</button>
+        <button class="btn btn-sm" onclick="openAddModal()">+ Add Reference</button>
+      </div>
+    </div>
+    <div class="moodboard" id="moodboard"></div>
+  </div>
+
+  <!-- SHOOT BRIEF -->
+  <div class="section" id="section-brief">
+    <p class="section-intro">Click any field to edit. All changes save automatically.</p>
+    <div class="two-col">
+      <div>
+        <div class="card-panel" style="margin-bottom:20px;">
+          <div class="panel-title">Shoot Brief</div>
+          <div class="brief-field">
+            <div class="brief-key">Concept Name</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Pool Edit — Quiet Luxury" data-key="conceptName"></div>
+          </div>
+          <div class="brief-field">
+            <div class="brief-key">Campaign Narrative</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="The loose story thread running through this shoot..." data-key="narrative" style="min-height:60px;"></div>
+          </div>
+          <div class="brief-field">
+            <div class="brief-key">Aesthetic Direction</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Editorial · Cinematic · Cool Girl · Effortless" data-key="aesthetic"></div>
+          </div>
+          <div class="brief-field">
+            <div class="brief-key">Location</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Bali Pink Villa — poolside, arch corridors, bedroom" data-key="location"></div>
+          </div>
+          <div class="brief-field">
+            <div class="brief-key">Mood / Feeling</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="What should someone feel looking at these images?" data-key="mood"></div>
+          </div>
+          <div class="brief-field">
+            <div class="brief-key">References / Inspo</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="Olivia Neill, Lila Moss, quiet luxury — not posed, not trying too hard" data-key="references"></div>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <div class="panel-title">Colour Story</div>
+          <div class="palette-row" id="paletteRow">
+            <div class="swatch-item">
+              <div class="swatch" style="background:#b8bcc4;" title="Soft Silver Grey"></div>
+              <div class="swatch-label">Silver</div>
+            </div>
+            <div class="swatch-item">
+              <div class="swatch" style="background:#c8d8e8;" title="Icy Baby Blue"></div>
+              <div class="swatch-label">Ice Blue</div>
+            </div>
+            <div class="swatch-item">
+              <div class="swatch" style="background:#2c2c2e;" title="Charcoal"></div>
+              <div class="swatch-label">Charcoal</div>
+            </div>
+            <div class="swatch-item">
+              <div class="swatch" style="background:#f7f4f0;" title="Cream"></div>
+              <div class="swatch-label">Cream</div>
+            </div>
+            <div class="swatch-item">
+              <button class="add-swatch" onclick="addSwatch()" title="Add colour">+</button>
+              <div class="swatch-label">Add</div>
+            </div>
+          </div>
+          <div class="brief-field" style="margin-top:12px;">
+            <div class="brief-key">Colour Notes</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Gunmetal Grey + Icy Baby Blue. Cool-toned, satin, soft silver lace." data-key="colourNotes"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card-panel" style="margin-bottom:20px;">
+          <div class="panel-title">Deliverables</div>
+          <div class="deliverables-grid" id="deliverablesGrid">
+            <div class="deliverable-item">
+              <div class="del-type">IG Grid / Carousel</div>
+              <div class="del-count" contenteditable="true">10–15</div>
+              <div class="del-note" contenteditable="true">Campaign + lifestyle stills</div>
+            </div>
+            <div class="deliverable-item">
+              <div class="del-type">IG Stories</div>
+              <div class="del-count" contenteditable="true">10+</div>
+              <div class="del-note" contenteditable="true">BTS + product close-ups</div>
+            </div>
+            <div class="deliverable-item">
+              <div class="del-type">IG Reels</div>
+              <div class="del-count" contenteditable="true">3–5</div>
+              <div class="del-note" contenteditable="true">Edited, music, 15–30s</div>
+            </div>
+            <div class="deliverable-item">
+              <div class="del-type">TikTok</div>
+              <div class="del-count" contenteditable="true">4–6</div>
+              <div class="del-note" contenteditable="true">Raw + edited vids</div>
+            </div>
+            <div class="deliverable-item">
+              <div class="del-type">Website Campaign</div>
+              <div class="del-count" contenteditable="true">20+</div>
+              <div class="del-note" contenteditable="true">Clean hero + editorial shots</div>
+            </div>
+            <div class="deliverable-item" style="border-style:dashed;cursor:pointer;" onclick="addDeliverable()">
+              <div class="del-type">+ Add</div>
+              <div class="del-count" style="color:var(--silver);">—</div>
+              <div class="del-note">Custom format</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <div class="panel-title">Content Moments</div>
+          <div class="brief-value" contenteditable="true" data-key="contentMoments" style="min-height:120px;font-size:0.78rem;line-height:1.8;" data-placeholder="Morning light in the villa&#10;Poolside — wet hair, slicked back&#10;Getting ready / mirror moments&#10;Golden hour drinks&#10;Night content — after dinner">Morning light in the villa
+Poolside — wet hair, slicked back
+Getting ready / mirror moments
+Golden hour drinks
+Walking through the villa
+Close-ups — jewellery, fabric detail
+Candid, movement, laughter</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOT LIST -->
+  <div class="section" id="section-shotlist">
+    <p class="section-intro">Build your shot list. Add shots, assign a light window, format and look number.</p>
+    <div class="card-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="panel-title" style="margin-bottom:0;">Shot List</div>
+        <button class="btn btn-sm" onclick="addShot()">+ Add Shot</button>
+      </div>
+      <div style="display:grid;grid-template-columns:28px 1fr 90px 90px 75px 28px;gap:8px;padding:0 12px 8px;border-bottom:1px solid var(--border);margin-bottom:8px;">
+        <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--soft);">#</span>
+        <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--soft);">Description</span>
+        <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--soft);">Light</span>
+        <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--soft);">Format</span>
+        <span style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--soft);">Look</span>
+        <span></span>
+      </div>
+      <div class="shot-list" id="shotList"></div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="section" id="section-schedule">
+    <p class="section-intro">Plan each day around Bali light. Click blocks to add shoot details. Aug 22–29.</p>
+    <div class="export-bar">
+      <span class="export-label">Light key:</span>
+      <span class="shot-light light-golden" style="font-size:0.62rem;padding:3px 10px;border-radius:10px;">Golden AM 6–8am</span>
+      <span class="shot-light light-morning" style="font-size:0.62rem;padding:3px 10px;border-radius:10px;">Soft Morning 8–11am</span>
+      <span class="shot-light" style="font-size:0.62rem;padding:3px 10px;border-radius:10px;background:#f0f0f5;color:#606080;">Shade / Interior 11am–3pm</span>
+      <span class="shot-light light-magic" style="font-size:0.62rem;padding:3px 10px;border-radius:10px;">Golden PM / Magic 4–6pm</span>
+    </div>
+    <div id="scheduleContainer"></div>
+  </div>
+
+  <!-- WARDROBE / STYLING -->
+  <div class="section" id="section-wardrobe">
+    <p class="section-intro">Define each look. Hair, makeup, wardrobe pieces, accessories, notes.</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div></div>
+      <button class="btn btn-sm" onclick="addLook()">+ Add Look</button>
+    </div>
+    <div class="wardrobe-grid" id="wardrobeGrid"></div>
+
+    <hr class="divider">
+    <div class="card-panel" style="margin-top:0;">
+      <div class="panel-title">Styling Direction</div>
+      <div class="two-col">
+        <div>
+          <div class="brief-field">
+            <div class="brief-key">Hair</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Slick buns, natural waves, wet hair slicked back" style="min-height:50px;" data-key="hairDir"></div>
+          </div>
+          <div class="brief-field">
+            <div class="brief-key">Makeup</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Wet skin, minimal makeup, neutral nails" style="min-height:50px;" data-key="makeupDir"></div>
+          </div>
+        </div>
+        <div>
+          <div class="brief-field">
+            <div class="brief-key">Jewellery & Accessories</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Silver jewellery, black oval sunglasses, delicate chains" style="min-height:50px;" data-key="jewelleryDir"></div>
+          </div>
+          <div class="brief-field">
+            <div class="brief-key">Overall Styling Notes</div>
+            <div class="brief-value" contenteditable="true" data-placeholder="e.g. Effortless, expensive, undone. Satin textures, sheer layers over swimwear." style="min-height:50px;" data-key="stylingNotes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODEL BRIEFS -->
+  <div class="section" id="section-models">
+    <p class="section-intro">One brief per model. Export individually to send to talent.</p>
+    <div class="model-grid">
+      <div class="model-card">
+        <div class="model-header">
+          <div>
+            <div class="model-name">Ava</div>
+            <div style="font-size:0.62rem;letter-spacing:0.12em;color:var(--soft);text-transform:uppercase;margin-top:4px;">Model 01</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="exportModel('ava')">Export PDF</button>
+        </div>
+        <div class="model-body">
+          <div class="model-field">
+            <div class="model-key">Looks Assigned</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Look 01, Look 03, Look 05"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Wardrobe</div>
+            <div class="model-val" contenteditable="true" data-placeholder="Piece names, colours, any fit notes" style="min-height:40px;"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Hair Direction</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Natural waves, slightly undone"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Makeup Direction</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Dewy skin, minimal — fresh and clean"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Pose / Energy References</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Olivia Neill energy — natural, candid, not stiff. See inspo board." style="min-height:50px;"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Notes</div>
+            <div class="model-val" contenteditable="true" data-placeholder="Any additional direction..." style="min-height:40px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-header">
+          <div>
+            <div class="model-name">Gracie</div>
+            <div style="font-size:0.62rem;letter-spacing:0.12em;color:var(--soft);text-transform:uppercase;margin-top:4px;">Model 02</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="exportModel('gracie')">Export PDF</button>
+        </div>
+        <div class="model-body">
+          <div class="model-field">
+            <div class="model-key">Looks Assigned</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Look 02, Look 04, Look 06"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Wardrobe</div>
+            <div class="model-val" contenteditable="true" data-placeholder="Piece names, colours, any fit notes" style="min-height:40px;"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Hair Direction</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Slick bun or wet look poolside"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Makeup Direction</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Bronzed, warm skin tone, glossy lip"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Pose / Energy References</div>
+            <div class="model-val" contenteditable="true" data-placeholder="e.g. Lila Moss — effortless, cool, minimal expression." style="min-height:50px;"></div>
+          </div>
+          <div class="model-field">
+            <div class="model-key">Notes</div>
+            <div class="model-val" contenteditable="true" data-placeholder="Any additional direction..." style="min-height:40px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES & IDEAS -->
+  <div class="section" id="section-collab">
+    <div class="two-col">
+      <div>
+        <div class="card-panel">
+          <div class="panel-title">Comments — Kim & Jess</div>
+          <div class="comments-thread" id="commentsThread"></div>
+          <div class="comment-form">
+            <div class="author-select">
+              <button class="author-btn kim active" id="authorKim" onclick="setAuthor('Kim')">Kim</button>
+              <button class="author-btn jess" id="authorJess" onclick="setAuthor('Jess')">Jess</button>
+            </div>
+            <textarea class="form-textarea" id="commentInput" placeholder="Leave a note for each other..." style="min-height:70px;"></textarea>
+            <div style="display:flex;justify-content:flex-end;">
+              <button class="btn btn-sm" onclick="addComment()">Post</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card-panel">
+          <div class="panel-title">Thoughts & Ideas</div>
+          <div class="thoughts-list" id="thoughtsList"></div>
+          <textarea class="form-textarea" id="thoughtInput" placeholder="Brain dump — shot ideas, directions, anything..." style="min-height:80px;"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+            <button class="btn btn-sm" onclick="addThought()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD REFERENCE MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">Add Reference</div>
+    <div class="form-group">
+      <label class="form-label">Image URL</label>
+      <input class="form-input" id="imgUrl" placeholder="Paste direct image URL (screenshot, Google Images, etc.)">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Source Link</label>
+      <input class="form-input" id="srcUrl" placeholder="TikTok, IG post, Pinterest URL...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Label</label>
+      <input class="form-input" id="imgLabel" placeholder="e.g. Golden hour poolside pose">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="imgNote" placeholder="What do you love about this? What to replicate?"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tags</label>
+      <div class="tag-select" id="tagSelect">
+        <button class="tag-option" onclick="toggleTag(this,'lighting')">Lighting</button>
+        <button class="tag-option" onclick="toggleTag(this,'poses')">Poses</button>
+        <button class="tag-option" onclick="toggleTag(this,'location')">Location</button>
+        <button class="tag-option" onclick="toggleTag(this,'styling')">Styling</button>
+        <button class="tag-option" onclick="toggleTag(this,'hair')">Hair</button>
+        <button class="tag-option" onclick="toggleTag(this,'colour')">Colour</button>
+        <button class="tag-option" onclick="toggleTag(this,'props')">Props</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveCard()">Save Reference</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SWATCH MODAL -->
+<div class="modal-overlay" id="swatchModal">
+  <div class="modal" style="width:320px;">
+    <div class="modal-title">Add Colour</div>
+    <div class="form-group">
+      <label class="form-label">Hex Code</label>
+      <input class="form-input" id="swatchHex" placeholder="#c8d8e8" maxlength="7">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Label</label>
+      <input class="form-input" id="swatchLabel" placeholder="e.g. Icy Blue">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeSwatchModal()">Cancel</button>
+      <button class="btn" onclick="saveSwatch()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+let state = {
+  boards: [
+    { name: 'Concept 01 — Pool Edit', status: 'collecting', cards: [], shots: [], looks: [], lastEdited: null },
+    { name: 'Concept 02 — Night Edit', status: 'collecting', cards: [], shots: [], looks: [], lastEdited: null }
+  ],
+  currentBoard: 0,
+  comments: [],
+  thoughts: [],
+  selectedTags: [],
+  currentAuthor: 'Kim',
+  dragSrcIdx: null
+};
+
+// Load from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem('alace_studio_v2');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('alace_studio_v2', JSON.stringify(state));
+  } catch(e) {}
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+loadState();
+buildSchedule();
+renderBoard();
+renderShots();
+renderWardrobe();
+renderComments();
+renderThoughts();
+updateLastEdited();
+
+// ─── SECTION NAV ──────────────────────────────────────────
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── BOARD MANAGEMENT ─────────────────────────────────────
+function switchBoard(idx, btn) {
+  state.currentBoard = idx;
+  document.querySelectorAll('.board-chip:not(.add-chip)').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderBoard();
+  renderShots();
+  renderWardrobe();
+  updateStatusSelect();
+  updateLastEdited();
+}
+
+function addBoard() {
+  const name = prompt('Board name (e.g. Concept 03 — Beach):');
+  if (!name) return;
+  state.boards.push({ name, status: 'collecting', cards: [], shots: [], looks: [], lastEdited: null });
+  const idx = state.boards.length - 1;
+  const bar = document.getElementById('boardBar');
+  const addBtn = bar.querySelector('.add-chip');
+  const chip = document.createElement('button');
+  chip.className = 'board-chip';
+  chip.setAttribute('data-board', idx);
+  chip.innerHTML = name + ' <span class="status-badge status-collecting">Collecting</span>';
+  chip.onclick = () => switchBoard(idx, chip);
+  bar.insertBefore(chip, addBtn);
+  switchBoard(idx, chip);
+  saveState();
+}
+
+function updateStatus(val) {
+  const board = state.boards[state.currentBoard];
+  board.status = val;
+  updateLastEdited();
+  saveState();
+}
+
+function updateStatusSelect() {
+  const sel = document.getElementById('statusSelect');
+  if (sel) sel.value = state.boards[state.currentBoard].status || 'collecting';
+}
+
+function updateLastEdited() {
+  const board = state.boards[state.currentBoard];
+  const el = document.getElementById('lastEdited');
+  if (el) {
+    el.textContent = board.lastEdited ? 'Last edited ' + board.lastEdited : 'Not yet edited';
+  }
+}
+
+function touchBoard() {
+  const now = new Date();
+  const formatted = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) + ' · ' + now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+  state.boards[state.currentBoard].lastEdited = formatted;
+  updateLastEdited();
+  saveState();
+}
+
+// ─── INSPO BOARD ──────────────────────────────────────────
+let activeTagFilter = 'all';
+
+function renderBoard() {
+  const board = document.getElementById('moodboard');
+  const cards = state.boards[state.currentBoard].cards || [];
+  const filtered = activeTagFilter === 'all' ? cards
+    : activeTagFilter === 'starred' ? cards.filter(c => c.starred)
+    : cards.filter(c => c.tags && c.tags.includes(activeTagFilter));
+
+  if (filtered.length === 0) {
+    board.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty-icon">✦</div>
+      <div class="empty-text">No references yet — add your first image to start building the board</div>
+      <button class="btn" onclick="openAddModal()">+ Add Reference</button>
+    </div>`;
+    return;
+  }
+
+  board.innerHTML = '';
+  filtered.forEach((card, i) => {
+    const realIdx = cards.indexOf(card);
+    board.appendChild(createCardEl(card, realIdx));
+  });
+}
+
+function createCardEl(card, idx) {
+  const el = document.createElement('div');
+  el.className = 'inspo-card' + (card.starred ? ' starred' : '');
+  el.draggable = true;
+  el.dataset.idx = idx;
+
+  const tagsHtml = (card.tags || []).map(t => `<span class="card-tag tag-${t}">${t}</span>`).join('');
+  const imgHtml = card.img
+    ? `<img src="${card.img}" alt="${card.label||''}" onerror="this.parentElement.querySelector('.no-img')&&(this.style.display='none');this.insertAdjacentHTML('afterend','<div class=\\'no-img\\'>Image unavailable</div>');">`
+    : `<div class="no-img">No image — see source link</div>`;
+
+  el.innerHTML = `
+    ${imgHtml}
+    <div class="card-body">
+      <div class="card-label">${card.label || 'Reference'}</div>
+      ${card.note ? `<div class="card-note">${card.note}</div>` : ''}
+      <div class="card-tags">${tagsHtml}</div>
+      <div class="card-actions">
+        <button class="star-btn" onclick="toggleStar(${idx})" title="Star">${card.starred ? '★' : '☆'}</button>
+        <button class="edit-btn" onclick="editCard(${idx})" title="Edit">✎</button>
+        <button class="del-btn" onclick="deleteCard(${idx})" title="Delete">✕</button>
+        ${card.src ? `<a class="card-link" href="${card.src}" target="_blank" title="${card.src}">↗ source</a>` : ''}
+      </div>
+    </div>`;
+
+  el.addEventListener('dragstart', e => { state.dragSrcIdx = idx; el.classList.add('dragging'); });
+  el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    el.classList.remove('drag-over');
+    if (state.dragSrcIdx !== null && state.dragSrcIdx !== idx) {
+      const cards = state.boards[state.currentBoard].cards;
+      const dragged = cards.splice(state.dragSrcIdx, 1)[0];
+      cards.splice(idx, 0, dragged);
+      touchBoard();
+      renderBoard();
+    }
+  });
+  return el;
+}
+
+function filterTag(tag, btn) {
+  activeTagFilter = tag;
+  document.querySelectorAll('.tag-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBoard();
+}
+
+function toggleStar(idx) {
+  const cards = state.boards[state.currentBoard].cards;
+  cards[idx].starred = !cards[idx].starred;
+  touchBoard();
+  renderBoard();
+}
+
+function deleteCard(idx) {
+  if (!confirm('Remove this reference?')) return;
+  state.boards[state.currentBoard].cards.splice(idx, 1);
+  touchBoard();
+  renderBoard();
+}
+
+let editingIdx = null;
+
+function editCard(idx) {
+  const card = state.boards[state.currentBoard].cards[idx];
+  editingIdx = idx;
+  document.getElementById('imgUrl').value = card.img || '';
+  document.getElementById('srcUrl').value = card.src || '';
+  document.getElementById('imgLabel').value = card.label || '';
+  document.getElementById('imgNote').value = card.note || '';
+  state.selectedTags = [...(card.tags || [])];
+  document.querySelectorAll('.tag-option').forEach(b => {
+    b.classList.toggle('selected', state.selectedTags.includes(b.textContent.toLowerCase()));
+  });
+  document.getElementById('addModal').classList.add('open');
+}
+
+// ─── MODAL ────────────────────────────────────────────────
+function openAddModal() {
+  editingIdx = null;
+  document.getElementById('imgUrl').value = '';
+  document.getElementById('srcUrl').value = '';
+  document.getElementById('imgLabel').value = '';
+  document.getElementById('imgNote').value = '';
+  state.selectedTags = [];
+  document.querySelectorAll('.tag-option').forEach(b => b.classList.remove('selected'));
+  document.getElementById('addModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('addModal').classList.remove('open');
+  editingIdx = null;
+}
+
+function toggleTag(btn, tag) {
+  btn.classList.toggle('selected');
+  if (state.selectedTags.includes(tag)) {
+    state.selectedTags = state.selectedTags.filter(t => t !== tag);
+  } else {
+    state.selectedTags.push(tag);
+  }
+}
+
+function saveCard() {
+  const img = document.getElementById('imgUrl').value.trim();
+  const src = document.getElementById('srcUrl').value.trim();
+  const label = document.getElementById('imgLabel').value.trim();
+  const note = document.getElementById('imgNote').value.trim();
+  const tags = [...state.selectedTags];
+
+  if (!label && !img && !src) { alert('Please add at least a label or image URL.'); return; }
+
+  const card = { img, src, label, note, tags, starred: false };
+
+  if (editingIdx !== null) {
+    const existing = state.boards[state.currentBoard].cards[editingIdx];
+    card.starred = existing.starred;
+    state.boards[state.currentBoard].cards[editingIdx] = card;
+  } else {
+    state.boards[state.currentBoard].cards.push(card);
+  }
+
+  touchBoard();
+  renderBoard();
+  closeModal();
+}
+
+// ─── SWATCH ───────────────────────────────────────────────
+function addSwatch() { document.getElementById('swatchModal').classList.add('open'); }
+function closeSwatchModal() { document.getElementById('swatchModal').classList.remove('open'); }
+function saveSwatch() {
+  const hex = document.getElementById('swatchHex').value.trim() || '#cccccc';
+  const label = document.getElementById('swatchLabel').value.trim() || 'Custom';
+  const row = document.getElementById('paletteRow');
+  const addItem = row.querySelector('.swatch-item:last-child');
+  const item = document.createElement('div');
+  item.className = 'swatch-item';
+  item.innerHTML = `<div class="swatch" style="background:${hex};"></div><div class="swatch-label">${label}</div>`;
+  row.insertBefore(item, addItem);
+  closeSwatchModal();
+}
+
+// ─── SHOT LIST ────────────────────────────────────────────
+const lightOptions = ['Golden AM', 'Soft Morning', 'Shade/Interior', 'Golden PM', 'Magic Hour', 'Any'];
+const formatOptions = ['Photo', 'Reel', 'TikTok', 'Carousel', 'Story', 'Campaign', 'Mixed'];
+
+function renderShots() {
+  const list = document.getElementById('shotList');
+  const shots = state.boards[state.currentBoard].shots || [];
+  if (shots.length === 0) {
+    list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--soft);font-size:0.72rem;letter-spacing:0.08em;">No shots yet — add your first</div>`;
+    return;
+  }
+  list.innerHTML = '';
+  shots.forEach((shot, i) => {
+    const row = document.createElement('div');
+    row.className = 'shot-item';
+    row.innerHTML = `
+      <span class="shot-num">${String(i+1).padStart(2,'0')}</span>
+      <input style="background:none;border:none;outline:none;font-family:'Jost',sans-serif;font-size:0.75rem;font-weight:300;color:var(--charcoal);width:100%;" value="${shot.desc||''}" placeholder="Shot description..." onchange="updateShot(${i},'desc',this.value)">
+      <select style="background:none;border:none;outline:none;font-family:'Jost',sans-serif;font-size:0.62rem;color:var(--mid);cursor:pointer;" onchange="updateShot(${i},'light',this.value)">
+        ${lightOptions.map(o => `<option ${shot.light===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+      <select style="background:none;border:none;outline:none;font-family:'Jost',sans-serif;font-size:0.62rem;color:var(--mid);cursor:pointer;" onchange="updateShot(${i},'format',this.value)">
+        ${formatOptions.map(o => `<option ${shot.format===o?'selected':''}>${o}</option>`).join('')}
+      </select>
+      <input style="background:none;border:none;outline:none;font-family:'Jost',sans-serif;font-size:0.65rem;color:var(--soft);width:100%;" value="${shot.look||''}" placeholder="Look #" onchange="updateShot(${i},'look',this.value)">
+      <button onclick="deleteShot(${i})" style="background:none;border:none;cursor:pointer;color:var(--silver);font-size:0.8rem;" title="Delete">✕</button>`;
+    list.appendChild(row);
+  });
+}
+
+function addShot() {
+  state.boards[state.currentBoard].shots = state.boards[state.currentBoard].shots || [];
+  state.boards[state.currentBoard].shots.push({ desc: '', light: 'Golden AM', format: 'Photo', look: '' });
+  touchBoard();
+  renderShots();
+}
+
+function updateShot(idx, key, val) {
+  state.boards[state.currentBoard].shots[idx][key] = val;
+  touchBoard();
+}
+
+function deleteShot(idx) {
+  state.boards[state.currentBoard].shots.splice(idx, 1);
+  touchBoard();
+  renderShots();
+}
+
+// ─── SCHEDULE ─────────────────────────────────────────────
+const shootDays = [
+  { day: 'Friday', date: 'Aug 22' },
+  { day: 'Saturday', date: 'Aug 23' },
+  { day: 'Sunday', date: 'Aug 24' },
+  { day: 'Monday', date: 'Aug 25' },
+  { day: 'Tuesday', date: 'Aug 26' },
+  { day: 'Wednesday', date: 'Aug 27' },
+  { day: 'Thursday', date: 'Aug 28' },
+  { day: 'Friday', date: 'Aug 29' },
+];
+
+const timeBlocks = [
+  { key: 'goldenAM', label: 'Golden AM · 6–8am', cls: 'block-golden' },
+  { key: 'morning', label: 'Soft Morning · 8–11am', cls: 'block-morning' },
+  { key: 'shade', label: 'Shade/Interior · 11am–3pm', cls: 'block-shade' },
+  { key: 'goldenPM', label: 'Golden PM · 4–6pm', cls: 'block-magic' },
+];
+
+function buildSchedule() {
+  if (!state.schedule) state.schedule = {};
+  const container = document.getElementById('scheduleContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  shootDays.forEach(d => {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'schedule-day';
+    const header = document.createElement('div');
+    header.className = 'day-header';
+    header.innerHTML = `<span class="day-title">${d.day}</span><span class="day-date">${d.date}</span>`;
+    dayEl.appendChild(header);
+    const blocks = document.createElement('div');
+    blocks.className = 'day-blocks';
+    timeBlocks.forEach(tb => {
+      const key = d.date + '_' + tb.key;
+      const block = document.createElement('div');
+      block.className = 'time-block ' + tb.cls;
+      block.innerHTML = `<div class="time-label">${tb.label}</div>
+        <div class="time-content" contenteditable="true" data-key="${key}">${state.schedule[key] || ''}</div>`;
+      block.querySelector('.time-content').addEventListener('input', function() {
+        state.schedule[this.dataset.key] = this.textContent;
+        saveState();
+      });
+      blocks.appendChild(block);
+    });
+    dayEl.appendChild(blocks);
+    container.appendChild(dayEl);
+  });
+}
+
+// ─── WARDROBE ─────────────────────────────────────────────
+function renderWardrobe() {
+  const grid = document.getElementById('wardrobeGrid');
+  const looks = state.boards[state.currentBoard].looks || [];
+
+  if (looks.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty-icon">✦</div>
+      <div class="empty-text">No looks yet</div>
+      <button class="btn" onclick="addLook()">+ Add Look</button>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  looks.forEach((look, i) => {
+    const card = document.createElement('div');
+    card.className = 'look-card';
+    card.innerHTML = `
+      <div class="look-number">${String(i+1).padStart(2,'0')}</div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+        <button onclick="deleteLook(${i})" style="background:none;border:none;cursor:pointer;color:var(--silver);font-size:0.75rem;">✕ Remove</button>
+      </div>
+      <div class="look-field">
+        <div class="look-key">Look Name</div>
+        <div class="look-val" contenteditable="true" data-placeholder="e.g. Poolside Gunmetal" data-look="${i}" data-field="name">${look.name||''}</div>
+      </div>
+      <div class="look-field">
+        <div class="look-key">Swimwear</div>
+        <div class="look-val" contenteditable="true" data-placeholder="Piece + colourway" data-look="${i}" data-field="swimwear">${look.swimwear||''}</div>
+      </div>
+      <div class="look-field">
+        <div class="look-key">Cover / Layers</div>
+        <div class="look-val" contenteditable="true" data-placeholder="Sheer shirt, slip dress..." data-look="${i}" data-field="cover">${look.cover||''}</div>
+      </div>
+      <div class="look-field">
+        <div class="look-key">Accessories</div>
+        <div class="look-val" contenteditable="true" data-placeholder="Jewellery, sunglasses, bag..." data-look="${i}" data-field="accessories">${look.accessories||''}</div>
+      </div>
+      <div class="look-field">
+        <div class="look-key">Hair</div>
+        <div class="look-val" contenteditable="true" data-placeholder="Wet slick / waves / bun..." data-look="${i}" data-field="hair">${look.hair||''}</div>
+      </div>
+      <div class="look-field">
+        <div class="look-key">Notes</div>
+        <div class="look-val" contenteditable="true" data-placeholder="Any styling notes..." data-look="${i}" data-field="notes">${look.notes||''}</div>
+      </div>`;
+
+    card.querySelectorAll('[data-look]').forEach(el => {
+      el.addEventListener('input', function() {
+        const li = parseInt(this.dataset.look);
+        const field = this.dataset.field;
+        state.boards[state.currentBoard].looks[li][field] = this.textContent;
+        touchBoard();
+      });
+    });
+    grid.appendChild(card);
+  });
+}
+
+function addLook() {
+  state.boards[state.currentBoard].looks = state.boards[state.currentBoard].looks || [];
+  state.boards[state.currentBoard].looks.push({ name: '', swimwear: '', cover: '', accessories: '', hair: '', notes: '' });
+  touchBoard();
+  renderWardrobe();
+}
+
+function deleteLook(idx) {
+  if (!confirm('Remove this look?')) return;
+  state.boards[state.currentBoard].looks.splice(idx, 1);
+  touchBoard();
+  renderWardrobe();
+}
+
+// ─── COMMENTS ─────────────────────────────────────────────
+function setAuthor(name) {
+  state.currentAuthor = name;
+  document.getElementById('authorKim').classList.toggle('active', name === 'Kim');
+  document.getElementById('authorJess').classList.toggle('active', name === 'Jess');
+}
+
+function addComment() {
+  const text = document.getElementById('commentInput').value.trim();
+  if (!text) return;
+  const now = new Date();
+  const date = now.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }) + ' · ' + now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+  state.comments.push({ author: state.currentAuthor, date, text });
+  document.getElementById('commentInput').value = '';
+  saveState();
+  renderComments();
+}
+
+function renderComments() {
+  const thread = document.getElementById('commentsThread');
+  if (!state.comments.length) {
+    thread.innerHTML = `<div style="color:var(--soft);font-size:0.72rem;font-style:italic;padding:8px 0;">No comments yet — leave a note for each other.</div>`;
+    return;
+  }
+  thread.innerHTML = state.comments.map((c, i) => `
+    <div class="comment-item ${c.author.toLowerCase()}">
+      <div class="comment-meta">
+        <span class="comment-author ${c.author.toLowerCase()}">${c.author}</span>
+        <span class="comment-date">${c.date}</span>
+        <button onclick="deleteComment(${i})" style="background:none;border:none;cursor:pointer;color:var(--silver);font-size:0.7rem;margin-left:auto;">✕</button>
+      </div>
+      <div class="comment-text">${c.text}</div>
+    </div>`).join('');
+}
+
+function deleteComment(idx) {
+  state.comments.splice(idx, 1);
+  saveState();
+  renderComments();
+}
+
+// ─── THOUGHTS ─────────────────────────────────────────────
+function addThought() {
+  const text = document.getElementById('thoughtInput').value.trim();
+  if (!text) return;
+  state.thoughts.push({ text });
+  document.getElementById('thoughtInput').value = '';
+  saveState();
+  renderThoughts();
+}
+
+function renderThoughts() {
+  const list = document.getElementById('thoughtsList');
+  if (!state.thoughts.length) {
+    list.innerHTML = `<div style="color:var(--soft);font-size:0.72rem;font-style:italic;padding:8px 0;">Brain dump space — add ideas, directions, anything.</div>`;
+    return;
+  }
+  list.innerHTML = state.thoughts.map((t, i) => `
+    <div class="thought-item">
+      <div class="thought-text" contenteditable="true" oninput="updateThought(${i}, this.textContent)">${t.text}</div>
+      <button class="thought-del" onclick="deleteThought(${i})">✕</button>
+    </div>`).join('');
+}
+
+function updateThought(idx, text) {
+  state.thoughts[idx].text = text;
+  saveState();
+}
+
+function deleteThought(idx) {
+  state.thoughts.splice(idx, 1);
+  saveState();
+  renderThoughts();
+}
+
+// ─── DELIVERABLES ─────────────────────────────────────────
+function addDeliverable() {
+  const grid = document.getElementById('deliverablesGrid');
+  const addBtn = grid.lastElementChild;
+  const item = document.createElement('div');
+  item.className = 'deliverable-item';
+  item.innerHTML = `
+    <div class="del-type" contenteditable="true">Format</div>
+    <div class="del-count" contenteditable="true">0</div>
+    <div class="del-note" contenteditable="true"></div>`;
+  grid.insertBefore(item, addBtn);
+}
+
+// ─── EXPORT ───────────────────────────────────────────────
+function exportBoard() {
+  const board = state.boards[state.currentBoard];
+  const cards = board.cards || [];
+  if (!cards.length) { alert('Add some references first.'); return; }
+
+  const w = window.open('', '_blank');
+  const cardsHtml = cards.map(c => `
+    <div style="break-inside:avoid;margin-bottom:16px;">
+      ${c.img ? `<img src="${c.img}" style="width:100%;border-radius:2px;display:block;margin-bottom:8px;" onerror="this.style.display='none'">` : ''}
+      <div style="font-family:'Jost',sans-serif;font-size:11px;font-weight:400;color:#2c2c2e;">${c.label||''}</div>
+      ${c.note ? `<div style="font-family:'Jost',sans-serif;font-size:10px;color:#6b6b70;margin-top:3px;">${c.note}</div>` : ''}
+      ${c.tags&&c.tags.length ? `<div style="margin-top:4px;">${c.tags.map(t=>`<span style="font-size:9px;background:#e8f0f7;color:#5a80a0;padding:2px 6px;border-radius:8px;margin-right:3px;">${t}</span>`).join('')}</div>` : ''}
+    </div>`).join('');
+
+  w.document.write(`<!DOCTYPE html><html><head>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+    <style>body{margin:40px;background:#f7f4f0;font-family:'Jost',sans-serif;}
+    .grid{columns:4;column-gap:16px;}</style></head><body>
+    <div style="margin-bottom:32px;border-bottom:1px solid #e8e4de;padding-bottom:20px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;">Alace</div>
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#9a9a9f;margin-top:4px;">${board.name} · Bali August 2025</div>
+    </div>
+    <div class="grid">${cardsHtml}</div>
+    <script>window.onload=()=>{window.print();}<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+function exportModel(name) {
+  alert(`To export ${name}'s brief, use your browser's Print function (Ctrl/Cmd+P) on this page and select "Save as PDF". A dedicated export is coming in a future update.`);
+}
+
+// ─── CLOSE MODAL ON OVERLAY CLICK ─────────────────────────
+document.getElementById('addModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+document.getElementById('swatchModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSwatchModal();
+});
+
+// ─── KEYBOARD ─────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeSwatchModal(); }
+});
+</script>
+</body>
+</html>
